@@ -1,5 +1,6 @@
 import SignUpPage from './SignUpPage';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 describe('>SignUp Page', () => {
 	describe('>Layout', () => {
@@ -53,6 +54,19 @@ describe('>SignUp Page', () => {
 			render(<SignUpPage />);
 			const button = screen.queryByRole('button', { name: 'Sign Up' });
 			expect(button).toBeDisabled();
+		});
+	});
+
+	describe('Interactions', () => {
+		it('should enable the button when passwords are equals', () => {
+			render(<SignUpPage />);
+			const passwordInput = screen.getByLabelText('Password');
+			const passwordRepeatInput =
+				screen.getByLabelText('Password Repeat');
+			userEvent.type(passwordInput, 'P4ssword');
+			userEvent.type(passwordRepeatInput, 'P4ssword');
+			const button = screen.queryByRole('button', { name: 'Sign Up' });
+			expect(button).toBeEnabled();
 		});
 	});
 });
