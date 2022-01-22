@@ -1,5 +1,10 @@
 import SignUpPage from './SignUpPage';
-import { render, screen } from '@testing-library/react';
+import {
+	render,
+	screen,
+	waitFor,
+	waitForElementToBeRemoved,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import { setupServer } from 'msw/node';
@@ -103,7 +108,9 @@ describe('>SignUp Page', () => {
 			// axios.post = mockFn;
 			window.fetch = mockFn;
 
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			await screen.findByText(
+				'Please check your e-mail to activate your account'
+			);
 			// const firstCallOfMockFunction = mockFn.mock.calls[0];
 			// const body = firstCallOfMockFunction[1];
 			// const body = JSON.parse(firstCallOfMockFunction[1].body);
@@ -127,7 +134,9 @@ describe('>SignUp Page', () => {
 			userEvent.click(button);
 			userEvent.click(button);
 
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			await screen.findByText(
+				'Please check your e-mail to activate your account'
+			);
 			expect(counter).toBe(1);
 		});
 
@@ -143,6 +152,40 @@ describe('>SignUp Page', () => {
 			userEvent.click(button);
 			const spinner = screen.getByRole('status');
 			expect(spinner).toBeInTheDocument();
+			await screen.findByText(
+				'Please check your e-mail to activate your account'
+			);
+		});
+
+		it('should display activation notif after succes signup requesy', async () => {
+			const server = setupServer(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					return res(ctx.status(200));
+				})
+			);
+			server.listen();
+			setup();
+			const message = 'Please check your e-mail to activate your account';
+			expect(screen.queryByText(message)).not.toBeInTheDocument();
+			userEvent.click(button);
+			const text = await screen.findByText(message);
+			expect(text).toBeInTheDocument();
+		});
+
+		it('should hides form after success signup request', async () => {
+			const server = setupServer(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					return res(ctx.status(200));
+				})
+			);
+			server.listen();
+			setup();
+			const form = screen.getByTestId('form-sign-up');
+			userEvent.click(button);
+			await waitFor(() => {
+				expect(form).not.toBeInTheDocument();
+			});
+			// await waitForElementToBeRemoved(form);
 		});
 	});
 });
