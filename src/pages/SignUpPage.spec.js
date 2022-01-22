@@ -61,25 +61,9 @@ describe('>SignUp Page', () => {
 	});
 
 	describe('Interactions', () => {
-		it('should enable the button when passwords are equals', () => {
-			render(<SignUpPage />);
-			const passwordInput = screen.getByLabelText('Password');
-			const passwordRepeatInput =
-				screen.getByLabelText('Password Repeat');
-			userEvent.type(passwordInput, 'Password');
-			userEvent.type(passwordRepeatInput, 'Password');
-			const button = screen.queryByRole('button', { name: 'Sign Up' });
-			expect(button).toBeEnabled();
-		});
-		it('should send username, email, password to back after clicking button', async () => {
-			let requestBody;
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					requestBody = req.body;
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
+		let button;
+
+		const setup = () => {
 			render(<SignUpPage />);
 			const usernameInput = screen.getByLabelText('Username');
 			const emailInput = screen.getByLabelText('E-mail');
@@ -90,7 +74,30 @@ describe('>SignUp Page', () => {
 			userEvent.type(emailInput, 'user1@mail.com');
 			userEvent.type(passwordInput, 'Password');
 			userEvent.type(passwordRepeatInput, 'Password');
+			button = screen.queryByRole('button', { name: 'Sign Up' });
+		};
+
+		it('should enable the button when passwords are equals', () => {
+			render(<SignUpPage />);
+			const passwordInput = screen.getByLabelText('Password');
+			const passwordRepeatInput =
+				screen.getByLabelText('Password Repeat');
+			userEvent.type(passwordInput, 'Password');
+			userEvent.type(passwordRepeatInput, 'Password');
 			const button = screen.queryByRole('button', { name: 'Sign Up' });
+			expect(button).toBeEnabled();
+		});
+
+		it('should send username, email, password to back after clicking button', async () => {
+			let requestBody;
+			const server = setupServer(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					requestBody = req.body;
+					return res(ctx.status(200));
+				})
+			);
+			server.listen();
+			setup();
 			userEvent.click(button);
 			const mockFn = jest.fn();
 			// axios.post = mockFn;
@@ -100,12 +107,42 @@ describe('>SignUp Page', () => {
 			// const firstCallOfMockFunction = mockFn.mock.calls[0];
 			// const body = firstCallOfMockFunction[1];
 			// const body = JSON.parse(firstCallOfMockFunction[1].body);
-			// console.log(`body =>`, body);
 			expect(requestBody).toEqual({
 				username: 'user1',
 				email: 'user1@mail.com',
 				password: 'Password',
 			});
+		});
+
+		it('should disables button when api is calling', async () => {
+			let counter = 0;
+			const server = setupServer(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					counter += 1;
+					return res(ctx.status(200));
+				})
+			);
+			server.listen();
+			setup();
+			userEvent.click(button);
+			userEvent.click(button);
+
+			await new Promise((resolve) => setTimeout(resolve, 500));
+			expect(counter).toBe(1);
+		});
+
+		it('should display spinner after clicking submit', async () => {
+			const server = setupServer(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					return res(ctx.status(200));
+				})
+			);
+			server.listen();
+			setup();
+			expect(screen.queryByRole('status')).not.toBeInTheDocument();
+			userEvent.click(button);
+			const spinner = screen.getByRole('status');
+			expect(spinner).toBeInTheDocument();
 		});
 	});
 });

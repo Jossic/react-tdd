@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const SignUpPage = () => {
-	const [values, setValues] = useState({});
+	const [values, setValues] = useState({
+		username: '',
+		email: '',
+		password: '',
+		passwordRepeat: '',
+		apiProgress: false,
+	});
 
-	const { password, passwordRepeat } = values;
+	const { password, passwordRepeat, apiProgress } = values;
 	let disabled = true;
 	if (password && passwordRepeat) {
 		disabled = password !== passwordRepeat;
@@ -14,7 +20,7 @@ const SignUpPage = () => {
 		e.preventDefault();
 		const { username, email, password } = values;
 		const body = { username, email, password };
-		console.log(`body =>`, body);
+		setValues({ ...values, apiProgress: true });
 		axios.post('/api/1.0/users', body);
 	};
 	return (
@@ -89,8 +95,14 @@ const SignUpPage = () => {
 					<div className='text-center'>
 						<button
 							className='btn btn-primary'
-							disabled={disabled}
+							disabled={disabled || apiProgress}
 							onClick={(e) => onSubmit(e)}>
+							{apiProgress && (
+								<span
+									className='spinner-border spinner-border-sm me-2'
+									role='status'
+								/>
+							)}
 							Sign Up
 						</button>
 					</div>
