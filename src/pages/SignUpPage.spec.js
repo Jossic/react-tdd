@@ -1,12 +1,6 @@
 import SignUpPage from './SignUpPage';
-import {
-	render,
-	screen,
-	waitFor,
-	waitForElementToBeRemoved,
-} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import axios from 'axios';
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
 
@@ -66,6 +60,21 @@ describe('>SignUp Page', () => {
 	});
 
 	describe('Interactions', () => {
+		let requestBody;
+		let counter = 0;
+		const server = setupServer(
+			rest.post('/api/1.0/users', (req, res, ctx) => {
+				requestBody = req.body;
+				counter += 1;
+				return res(ctx.status(200));
+			})
+		);
+		beforeEach(() => {
+			counter = 0;
+		});
+		beforeAll(() => server.listen());
+		afterAll(() => server.close());
+
 		let button;
 
 		const setup = () => {
@@ -93,20 +102,12 @@ describe('>SignUp Page', () => {
 			expect(button).toBeEnabled();
 		});
 
-		it('should send username, email, password to back after clicking button', async () => {
-			let requestBody;
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					requestBody = req.body;
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
+		it('should sends username, email, password to back after clicking button', async () => {
 			setup();
 			userEvent.click(button);
-			const mockFn = jest.fn();
+			// const mockFn = jest.fn();
 			// axios.post = mockFn;
-			window.fetch = mockFn;
+			// window.fetch = mockFn;
 
 			await screen.findByText(
 				'Please check your e-mail to activate your account'
@@ -122,14 +123,6 @@ describe('>SignUp Page', () => {
 		});
 
 		it('should disables button when api is calling', async () => {
-			let counter = 0;
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					counter += 1;
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
 			setup();
 			userEvent.click(button);
 			userEvent.click(button);
@@ -141,12 +134,6 @@ describe('>SignUp Page', () => {
 		});
 
 		it('should display spinner after clicking submit', async () => {
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
 			setup();
 			expect(screen.queryByRole('status')).not.toBeInTheDocument();
 			userEvent.click(button);
@@ -158,12 +145,6 @@ describe('>SignUp Page', () => {
 		});
 
 		it('should display activation notif after succes signup requesy', async () => {
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
 			setup();
 			const message = 'Please check your e-mail to activate your account';
 			expect(screen.queryByText(message)).not.toBeInTheDocument();
@@ -173,12 +154,6 @@ describe('>SignUp Page', () => {
 		});
 
 		it('should hides form after success signup request', async () => {
-			const server = setupServer(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					return res(ctx.status(200));
-				})
-			);
-			server.listen();
 			setup();
 			const form = screen.getByTestId('form-sign-up');
 			userEvent.click(button);

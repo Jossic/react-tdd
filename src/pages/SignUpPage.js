@@ -17,16 +17,17 @@ const SignUpPage = () => {
 		disabled = password !== passwordRepeat;
 	}
 
-	const onSubmit = (e) => {
+	const onSubmit = async (e) => {
 		e.preventDefault();
 		const { username, email, password } = values;
 		const body = { username, email, password };
 		setValues({ ...values, apiProgress: true });
-		axios.post('/api/1.0/users', body).then((response) => {
-			// console.log(`response =>`, response);
-
+		try {
+			await axios.post('/api/1.0/users', body);
 			setValues({ ...values, signupSuccess: true });
-		});
+		} catch (error) {
+			console.log(`catch error =>`, error);
+		}
 	};
 	return (
 		<div className='col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
