@@ -14,14 +14,8 @@ const SignUpPage = () => {
 		e.preventDefault();
 		const { username, email, password } = values;
 		const body = { username, email, password };
+		console.log(`body =>`, body);
 		axios.post('/api/1.0/users', body);
-		// fetch('/api/1.0/users', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json',
-		// 	},
-		// 	body: JSON.stringify(body),
-		// });
 	};
 	return (
 		<>
