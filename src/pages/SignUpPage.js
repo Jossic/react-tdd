@@ -79,7 +79,10 @@ const SignUpPage = () => {
 							type='password'
 							values={values}
 							setValues={setValues}
-							error={errors.passwordRepeat}
+							error={
+								password !== passwordRepeat &&
+								'Passwords mismatch'
+							}
 						/>
 
 						<div className='text-center'>
