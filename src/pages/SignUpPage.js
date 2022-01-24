@@ -9,9 +9,11 @@ const SignUpPage = () => {
 		passwordRepeat: '',
 		apiProgress: false,
 		signupSuccess: false,
+		errors: {},
 	});
 
-	const { password, passwordRepeat, apiProgress, signupSuccess } = values;
+	const { password, passwordRepeat, apiProgress, signupSuccess, errors } =
+		values;
 	let disabled = true;
 	if (password && passwordRepeat) {
 		disabled = password !== passwordRepeat;
@@ -26,7 +28,13 @@ const SignUpPage = () => {
 			await axios.post('/api/1.0/users', body);
 			setValues({ ...values, signupSuccess: true });
 		} catch (error) {
-			console.log(`catch error =>`, error);
+			if (error.response.status === 400) {
+				setValues({
+					...values,
+					errors: error.response.data.validationErrors,
+				});
+			}
+			// console.log(`catch error =>`, error);
 		}
 	};
 	return (
@@ -51,6 +59,11 @@ const SignUpPage = () => {
 									})
 								}
 							/>
+							{errors.username && (
+								<span className='text-danger'>
+									{errors.username}
+								</span>
+							)}
 						</div>
 						<div className='mb-3'>
 							<label htmlFor='email' className='form-label'>
@@ -66,6 +79,11 @@ const SignUpPage = () => {
 									})
 								}
 							/>
+							{errors.email && (
+								<span className='text-danger'>
+									{errors.email}
+								</span>
+							)}
 						</div>
 						<div className='mb-3'>
 							<label htmlFor='password' className='form-label'>
@@ -82,6 +100,11 @@ const SignUpPage = () => {
 									})
 								}
 							/>
+							{errors.password && (
+								<span className='text-danger'>
+									{errors.password}
+								</span>
+							)}
 						</div>
 						<div className='mb-3'>
 							<label
