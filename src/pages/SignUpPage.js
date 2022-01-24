@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Input } from '../components/Input';
 
 const SignUpPage = () => {
 	const [values, setValues] = useState({
@@ -46,85 +47,37 @@ const SignUpPage = () => {
 						<h1 className='text-center'>Sign Up</h1>
 					</div>
 					<div className='card-body'>
-						<div className='mb-3'>
-							<label htmlFor='username' className='form-label'>
-								Username
-							</label>
-							<input
-								id='username'
-								className='form-control'
-								onChange={(e) =>
-									setValues({
-										...values,
-										username: e.target.value,
-									})
-								}
-							/>
-							{errors.username && (
-								<span className='text-danger'>
-									{errors.username}
-								</span>
-							)}
-						</div>
-						<div className='mb-3'>
-							<label htmlFor='email' className='form-label'>
-								E-mail
-							</label>
-							<input
-								id='email'
-								className='form-control'
-								onChange={(e) =>
-									setValues({
-										...values,
-										email: e.target.value,
-									})
-								}
-							/>
-							{errors.email && (
-								<span className='text-danger'>
-									{errors.email}
-								</span>
-							)}
-						</div>
-						<div className='mb-3'>
-							<label htmlFor='password' className='form-label'>
-								Password
-							</label>
-							<input
-								id='password'
-								type='password'
-								className='form-control'
-								onChange={(e) =>
-									setValues({
-										...values,
-										password: e.target.value,
-									})
-								}
-							/>
-							{errors.password && (
-								<span className='text-danger'>
-									{errors.password}
-								</span>
-							)}
-						</div>
-						<div className='mb-3'>
-							<label
-								htmlFor='passwordRepeat'
-								className='form-label'>
-								Password Repeat
-							</label>
-							<input
-								id='passwordRepeat'
-								className='form-control'
-								type='password'
-								onChange={(e) =>
-									setValues({
-										...values,
-										passwordRepeat: e.target.value,
-									})
-								}
-							/>
-						</div>
+						<Input
+							id='username'
+							label='Username'
+							values={values}
+							setValues={setValues}
+							errors={errors.username}
+						/>
+						<Input
+							id='email'
+							label='E-mail'
+							values={values}
+							setValues={setValues}
+							errors={errors.email}
+						/>
+						<Input
+							id='password'
+							label='Password'
+							type='password'
+							values={values}
+							setValues={setValues}
+							errors={errors.password}
+						/>
+						<Input
+							id='passwordRepeat'
+							label='Password Repeat'
+							type='password'
+							values={values}
+							setValues={setValues}
+							errors={errors.passwordRepeat}
+						/>
+
 						<div className='text-center'>
 							<button
 								className='btn btn-primary'
