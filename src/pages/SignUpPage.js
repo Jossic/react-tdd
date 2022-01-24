@@ -39,10 +39,14 @@ const SignUpPage = () => {
 			// console.log(`catch error =>`, error);
 		}
 	};
+
 	return (
 		<div className='col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
 			{!signupSuccess && (
-				<form className='card mt-5' data-testid='form-sign-up'>
+				<form
+					className='card mt-5 needs-validation'
+					data-testid='form-sign-up'
+					novalidate='true'>
 					<div className='card-header'>
 						<h1 className='text-center'>Sign Up</h1>
 					</div>
@@ -52,14 +56,14 @@ const SignUpPage = () => {
 							label='Username'
 							values={values}
 							setValues={setValues}
-							errors={errors.username}
+							error={errors.username}
 						/>
 						<Input
 							id='email'
 							label='E-mail'
 							values={values}
 							setValues={setValues}
-							errors={errors.email}
+							error={errors.email}
 						/>
 						<Input
 							id='password'
@@ -67,7 +71,7 @@ const SignUpPage = () => {
 							type='password'
 							values={values}
 							setValues={setValues}
-							errors={errors.password}
+							error={errors.password}
 						/>
 						<Input
 							id='passwordRepeat'
@@ -75,7 +79,7 @@ const SignUpPage = () => {
 							type='password'
 							values={values}
 							setValues={setValues}
-							errors={errors.passwordRepeat}
+							error={errors.passwordRepeat}
 						/>
 
 						<div className='text-center'>
