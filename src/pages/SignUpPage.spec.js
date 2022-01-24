@@ -145,7 +145,7 @@ describe('>SignUp Page', () => {
 			);
 		});
 
-		it('should display activation notif after succes signup requesy', async () => {
+		it('should display activation notif after succes signup request', async () => {
 			setup();
 			const message = 'Please check your e-mail to activate your account';
 			expect(screen.queryByText(message)).not.toBeInTheDocument();
@@ -164,40 +164,37 @@ describe('>SignUp Page', () => {
 			// await waitForElementToBeRemoved(form);
 		});
 
-		it('should display validation message for username', async () => {
-			server.use(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					return res(
-						ctx.status(400),
-						ctx.json({
-							validationErrors: {
-								username: 'Username cannot be null',
-							},
-						})
-					);
-				})
-			);
+		const generateValidationError = (field, message) => {
+			return rest.post('/api/1.0/users', (req, res, ctx) => {
+				return res(
+					ctx.status(400),
+					ctx.json({
+						validationErrors: {
+							[field]: message,
+						},
+					})
+				);
+			});
+		};
+
+		it.each`
+			field         | message
+			${'username'} | ${'Username cannot be null'}
+			${'email'}    | ${'E-mail cannot be null'}
+			${'password'} | ${'Password must be at least 6 characters'}
+		`('should displays $message for $field', async ({ field, message }) => {
+			server.use(generateValidationError(field, message));
 			setup();
 			userEvent.click(button);
-			const validationError = await screen.findByText(
-				'Username cannot be null'
-			);
+			const validationError = await screen.findByText(message);
 			expect(validationError).toBeInTheDocument();
 		});
 
-		it('should hides spinner & enable button after response received', async () => {
+		it('should hides spinner and enable button after response received', async () => {
 			server.use(
-				rest.post('/api/1.0/users', (req, res, ctx) => {
-					return res(
-						ctx.status(400),
-						ctx.json({
-							validationErrors: {
-								username: 'Username cannot be null',
-							},
-						})
-					);
-				})
+				generateValidationError('username', 'Username cannot be null')
 			);
+
 			setup();
 			userEvent.click(button);
 			await screen.findByText('Username cannot be null');

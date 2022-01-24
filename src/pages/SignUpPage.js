@@ -46,7 +46,7 @@ const SignUpPage = () => {
 				<form
 					className='card mt-5 needs-validation'
 					data-testid='form-sign-up'
-					novalidate='true'>
+					noValidate={true}>
 					<div className='card-header'>
 						<h1 className='text-center'>Sign Up</h1>
 					</div>
