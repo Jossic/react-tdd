@@ -40,6 +40,17 @@ const SignUpPage = () => {
 		}
 	};
 
+	const onChange = (event) => {
+		const { id, value } = event.target;
+		const errorsCopy = { ...values.errors };
+		delete errorsCopy[id];
+		setValues({
+			...values,
+			[id]: value,
+			errors: errorsCopy,
+		});
+	};
+
 	return (
 		<div className='col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
 			{!signupSuccess && (
@@ -54,31 +65,27 @@ const SignUpPage = () => {
 						<Input
 							id='username'
 							label='Username'
-							values={values}
-							setValues={setValues}
+							onChange={(e) => onChange(e)}
 							error={errors.username}
 						/>
 						<Input
 							id='email'
 							label='E-mail'
-							values={values}
-							setValues={setValues}
+							onChange={(e) => onChange(e)}
 							error={errors.email}
 						/>
 						<Input
 							id='password'
 							label='Password'
 							type='password'
-							values={values}
-							setValues={setValues}
+							onChange={(e) => onChange(e)}
 							error={errors.password}
 						/>
 						<Input
 							id='passwordRepeat'
 							label='Password Repeat'
 							type='password'
-							values={values}
-							setValues={setValues}
+							onChange={(e) => onChange(e)}
 							error={
 								password !== passwordRepeat &&
 								'Passwords mismatch'

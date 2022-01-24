@@ -1,13 +1,6 @@
 import React from 'react';
 
-export const Input = ({
-	id,
-	label,
-	values,
-	setValues,
-	error,
-	type = 'text',
-}) => {
+export const Input = ({ id, label, onChange, error, type = 'text' }) => {
 	return (
 		<div className='mb-3'>
 			<label htmlFor={id} className='form-label'>
@@ -17,12 +10,7 @@ export const Input = ({
 				id={id}
 				className={`form-control ${error && 'is-invalid'}`}
 				type={type}
-				onChange={(e) =>
-					setValues({
-						...values,
-						[id]: e.target.value,
-					})
-				}
+				onChange={onChange}
 			/>
 			{error && <span className='invalid-feedback'>{error}</span>}
 		</div>

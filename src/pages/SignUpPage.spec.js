@@ -76,12 +76,16 @@ describe('>SignUp Page', () => {
 		beforeAll(() => server.listen());
 		afterAll(() => server.close());
 
-		let button, passwordInput, passwordRepeatInput;
+		let button,
+			usernameInput,
+			emailInput,
+			passwordInput,
+			passwordRepeatInput;
 
 		const setup = () => {
 			render(<SignUpPage />);
-			const usernameInput = screen.getByLabelText('Username');
-			const emailInput = screen.getByLabelText('E-mail');
+			usernameInput = screen.getByLabelText('Username');
+			emailInput = screen.getByLabelText('E-mail');
 			passwordInput = screen.getByLabelText('Password');
 			passwordRepeatInput = screen.getByLabelText('Password Repeat');
 			userEvent.type(usernameInput, 'user1');
@@ -208,5 +212,22 @@ describe('>SignUp Page', () => {
 			const validationError = screen.queryByText('Passwords mismatch');
 			expect(validationError).toBeInTheDocument();
 		});
+
+		it.each`
+			field         | message                                     | label
+			${'username'} | ${'Username cannot be null'}                | ${'Username'}
+			${'email'}    | ${'E-mail cannot be null'}                  | ${'E-mail'}
+			${'password'} | ${'Password must be at least 6 characters'} | ${'Password'}
+		`(
+			'should clear validation error after $field field is ok',
+			async ({ field, message, label }) => {
+				server.use(generateValidationError(field, message));
+				setup();
+				userEvent.click(button);
+				const validationError = await screen.findByText(message);
+				userEvent.type(screen.getByLabelText(label), 'updated');
+				expect(validationError).not.toBeInTheDocument();
+			}
+		);
 	});
 });
