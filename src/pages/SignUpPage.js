@@ -26,11 +26,12 @@ const SignUpPage = () => {
 		setValues({ ...values, apiProgress: true });
 		try {
 			await axios.post('/api/1.0/users', body);
-			setValues({ ...values, signupSuccess: true });
+			setValues({ ...values, signupSuccess: true, apiProgress: false });
 		} catch (error) {
 			if (error.response.status === 400) {
 				setValues({
 					...values,
+					apiProgress: false,
 					errors: error.response.data.validationErrors,
 				});
 			}

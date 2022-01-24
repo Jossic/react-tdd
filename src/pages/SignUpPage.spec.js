@@ -1,5 +1,5 @@
 import SignUpPage from './SignUpPage';
-import { render, screen, waitFor } from '@testing-library/react';
+import { queryByRole, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
@@ -182,6 +182,26 @@ describe('>SignUp Page', () => {
 				'Username cannot be null'
 			);
 			expect(validationError).toBeInTheDocument();
+		});
+
+		it('should hides spinner & enable button after response received', async () => {
+			server.use(
+				rest.post('/api/1.0/users', (req, res, ctx) => {
+					return res(
+						ctx.status(400),
+						ctx.json({
+							validationErrors: {
+								username: 'Username cannot be null',
+							},
+						})
+					);
+				})
+			);
+			setup();
+			userEvent.click(button);
+			await screen.findByText('Username cannot be null');
+			expect(screen.queryByRole('status')).not.toBeInTheDocument();
+			expect(button).toBeEnabled();
 		});
 	});
 });
